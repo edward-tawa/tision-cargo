@@ -122,3 +122,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
         "role",
         "age",
     ]
+    objects = CustomUserManager()
