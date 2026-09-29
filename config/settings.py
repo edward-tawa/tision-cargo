@@ -48,7 +48,12 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "core",
+    "phonenumber_field",
 ]
+
+
+PHONENUMBER_DEFAULT_REGION = "ZW"  # lets users type local numbers like 0771234567
+PHONENUMBER_DB_FORMAT = "E164"
 
 LOCAL_APPS = []
 
