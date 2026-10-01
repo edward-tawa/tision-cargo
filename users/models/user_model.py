@@ -28,7 +28,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("status", CustomUser.STATUS.VERIFIED)
-        extra_fields.setdefault("role", CustomUser.UserRole.ADMIN)
+        extra_fields.setdefault("role", CustomUser.ROLE.ADMIN)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("Superuser must have is_staff=True."))
@@ -41,7 +41,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     """Custom user model that uses email as the unique identifier instead of username."""
 
-    class UserRole(models.TextChoices):
+    class ROLE(models.TextChoices):
         ADMIN = "admin", _("Admin")
         CLIENT = "client", _("Client")
         DRIVER = "driver", _("Driver")
@@ -56,6 +56,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
         unique=True,
         help_text=_("Required. Enter a valid email address."),
     )
+
     first_name = models.CharField(
         _("first name"),
         max_length=150,
@@ -81,8 +82,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     role = models.CharField(
         _("role"),
         max_length=20,
-        choices=UserRole.choices,
-        default=UserRole.CLIENT,
+        choices=ROLE.choices,
+        default=ROLE.CLIENT,
         help_text=_(
             "Required. Select the role of the user (Admin, Client, or Driver)."
         ),
@@ -123,6 +124,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
             ("can_change_user_email", _("Can change user email")),
             ("can_change_user_phone_number", _("Can change user phone number")),
             ("can_change_user_age", _("Can change user age")),
+            ("can_create_bid", _("Can create bid")),
+            ("can_accept_bid", _("Can accept bid")),
+            ("can_reject_bid", _("Can reject bid")),
+            ("can_cancel_bid", _("Can cancel bid")),
+            ("can_complete_bid", _("Can complete bid")),
         ]
 
     def __str__(self):
