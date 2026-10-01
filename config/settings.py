@@ -106,10 +106,21 @@ DATABASES = {
 }
 
 
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    # Custom Cookie Names
+    "ACCESS_COOKIE": "access_token",
+    "REFRESH_COOKIE": "refresh_token",
 }
 
 
