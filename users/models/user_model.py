@@ -41,7 +41,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     """Custom user model that uses email as the unique identifier instead of username."""
 
-    class UserRole(models.TextChoices):
+    class ROLE(models.TextChoices):
         ADMIN = "admin", _("Admin")
         CLIENT = "client", _("Client")
         DRIVER = "driver", _("Driver")
@@ -81,8 +81,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     role = models.CharField(
         _("role"),
         max_length=20,
-        choices=UserRole.choices,
-        default=UserRole.CLIENT,
+        choices=ROLE.choices,
+        default=ROLE.CLIENT,
         help_text=_(
             "Required. Select the role of the user (Admin, Client, or Driver)."
         ),

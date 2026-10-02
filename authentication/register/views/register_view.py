@@ -1,8 +1,9 @@
-from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from authentication.register.serializers.register_serializer import RegisterSerializer
 
 
 class RegisterView(APIView):
@@ -18,6 +19,9 @@ class RegisterView(APIView):
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
         phone_number = request.data.get("phone_number")
+        age = request.data.get("age")
+        role = request.data.get("role")
+        status = request.data.get("status")
 
         if not username or not email or not password:
             return Response(
@@ -25,31 +29,18 @@ class RegisterView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if User.objects.filter(username=username).exists():
+        serializer = RegisterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
             return Response(
-                {"error": "Username already exists."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {
+                    "user": serializer.data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                status=status.HTTP_201_CREATED,
             )
 
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"error": "Email already exists."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user = User.objects.create_user(
-            username=username, email=email, password=password
-        )
-        refresh = RefreshToken.for_user(user)
-
-        response_data = {
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-            },
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-        }
-
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
