@@ -48,9 +48,14 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "core",
+    "phonenumber_field",
 ]
 
-LOCAL_APPS = []
+
+PHONENUMBER_DEFAULT_REGION = "ZW"  # lets users type local numbers like 0771234567
+PHONENUMBER_DB_FORMAT = "E164"
+
+LOCAL_APPS = ["users"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -101,10 +106,21 @@ DATABASES = {
 }
 
 
+# settings.py
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    # Custom Cookie Names
+    "ACCESS_COOKIE": "access_token",
+    "REFRESH_COOKIE": "refresh_token",
 }
 
 
@@ -137,6 +153,9 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+
+AUTH_USER_MODEL = "users.CustomUser"
 
 
 # Static files (CSS, JavaScript, Images)
