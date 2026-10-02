@@ -55,7 +55,7 @@ THIRD_PARTY_APPS = [
 PHONENUMBER_DEFAULT_REGION = "ZW"  # lets users type local numbers like 0771234567
 PHONENUMBER_DB_FORMAT = "E164"
 
-LOCAL_APPS = []
+LOCAL_APPS = ["users"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -153,6 +153,9 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+
+AUTH_USER_MODEL = "users.CustomUser"
 
 
 # Static files (CSS, JavaScript, Images)
