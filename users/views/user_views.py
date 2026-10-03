@@ -1,5 +1,4 @@
 # users/views/user_views.py
-from core.responses import success_response
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 
@@ -11,6 +10,8 @@ from users.serializers.user_serializers import (
 )
 from users.services.user_business_service import UserBusinessService
 from users.services.user_crud_service import UserCRUDService
+
+from ..core.api_responses.responses import success_response
 
 
 class UserViewSet(viewsets.GenericViewSet):
