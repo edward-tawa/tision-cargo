@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
@@ -11,6 +12,7 @@ class CustomTokenRefreshView(APIView):
     formatted with your custom response structure.
     """
 
+    permission_classes = [AllowAny]
     serializer_class = TokenRefreshSerializer
 
     def post(self, request):
