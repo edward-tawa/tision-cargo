@@ -13,12 +13,14 @@ from core.models.time_stamp_model import TimeStampModel
 class CustomUserManager(BaseUserManager):
     """Custom user manager to handle user creation and management."""
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, phone_number, password=None, **extra_fields):
         """Create and save a regular user with the given email and password."""
         if not email:
             raise ValueError(_("The Email field must be set"))
+        if not phone_number:
+            raise ValueError(_("The Phone Number field must be set"))
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, phone_number=phone_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user

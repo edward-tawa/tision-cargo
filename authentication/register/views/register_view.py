@@ -1,46 +1,47 @@
+from rest_framework import status
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from users.serializers.user_serializers import UserCreateSerializer
 
-from authentication.register.serializers.register_serializer import RegisterSerializer
+# Import your custom response helpers
+from core.api_responses.responses import error_response, success_response
 
 
 class RegisterView(APIView):
+    """
+    Handle user registration and return JWT tokens upon success using standard response wrappers.
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """
-        Handle user registration.
-        """
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
-        first_name = request.data.get("first_name")
-        last_name = request.data.get("last_name")
-        phone_number = request.data.get("phone_number")
-        age = request.data.get("age")
-        role = request.data.get("role")
-        status = request.data.get("status")
-
-        if not username or not email or not password:
-            return Response(
-                {"error": "Username, email, and password are required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        serializer = RegisterSerializer(data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
+
+            # Generate JWT tokens for the newly registered user
             refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "user": serializer.data,
+
+            # Package user data and tokens together for the response data
+            response_data = {
+                "user": serializer.data,
+                "tokens": {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
                 },
+            }
+
+            return success_response(
+                message="User registered successfully.",
                 status=status.HTTP_201_CREATED,
+                data=response_data,
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Return validation errors neatly using your error wrapper
+        return error_response(
+            message="Registration failed due to validation errors.",
+            status=status.HTTP_400_BAD_REQUEST,
+            errors=serializer.errors,
+        )

@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 
 from users.models.user_model import CustomUser
 from users.serializers.user_serializers import (
-    UserCreateSerializer,
-    UserReadSerializer,
-    UserUpdateSerializer,
+    CreateUserSerializer,
+    ReadUserSerializer,
+    UpdateUserSerializer,
 )
 from users.services.user_business_service import UserBusinessService
 from users.services.user_crud_service import UserCRUDService
@@ -18,41 +18,41 @@ class UserViewSet(viewsets.GenericViewSet):
 
     def get_serializer_class(self):
         if self.action == "create":
-            return UserCreateSerializer
+            return CreateUserSerializer
         if self.action in ("update", "partial_update"):
-            return UserUpdateSerializer
-        return UserReadSerializer
+            return UpdateUserSerializer
+        return ReadUserSerializer
 
     def list(self, request):
         users = self.filter_queryset(self.get_queryset())
         return success_response(
             "Users retrieved successfully.",
-            UserReadSerializer(users, many=True).data,
+            ReadUserSerializer(users, many=True).data,
         )
 
     def retrieve(self, request, pk=None):
         user = UserCRUDService.get_user_by_id(pk)
         return success_response(
-            "User retrieved successfully.", UserReadSerializer(user).data
+            "User retrieved successfully.", ReadUserSerializer(user).data
         )
 
     def create(self, request):
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = UserCRUDService.create_user(**serializer.validated_data)
         return success_response(
             "User created successfully.",
-            UserReadSerializer(user).data,
+            ReadUserSerializer(user).data,
             status=status.HTTP_201_CREATED,
         )
 
     def partial_update(self, request, pk=None):
         user = UserCRUDService.get_user_by_id(pk)
-        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        serializer = UpdateUserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         user = UserCRUDService.update_user(pk, **serializer.validated_data)
         return success_response(
-            "User updated successfully.", UserReadSerializer(user).data
+            "User updated successfully.", ReadUserSerializer(user).data
         )
 
     def destroy(self, request, pk=None):
@@ -65,19 +65,19 @@ class UserViewSet(viewsets.GenericViewSet):
     def suspend(self, request, pk=None):
         user = UserBusinessService.suspend_user(pk, actor_id=request.user.id)
         return success_response(
-            "User suspended successfully.", UserReadSerializer(user).data
+            "User suspended successfully.", ReadUserSerializer(user).data
         )
 
     @action(detail=True, methods=["post"])
     def activate(self, request, pk=None):
         user = UserBusinessService.activate_user(pk, actor_id=request.user.id)
         return success_response(
-            "User activated successfully.", UserReadSerializer(user).data
+            "User activated successfully.", ReadUserSerializer(user).data
         )
 
     @action(detail=True, methods=["post"], url_path="make-admin")
     def make_admin(self, request, pk=None):
         user = UserBusinessService.make_admin(pk, actor_id=request.user.id)
         return success_response(
-            "User role changed to admin.", UserReadSerializer(user).data
+            "User role changed to admin.", ReadUserSerializer(user).data
         )
