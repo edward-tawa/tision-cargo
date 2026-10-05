@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
-import os
 from datetime import timedelta
 from pathlib import Path
+
+from decouple import Csv, config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,15 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-x*u_05z9f+fscf@)rrpljkf!yz2teb@_ds0u4z41^!c23!wt=%"
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-x*u_05z9f+fscf@)rrpljkf!yz2teb@_ds0u4z41^!c23!wt=%",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv())
 
-
-# Application definition
 
 # Application definition
 
@@ -49,7 +51,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "core",
     "phonenumber_field",
-    'user_profiles',
+    "drf_spectacular",
 ]
 
 
@@ -94,23 +96,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "tision"),
-        "USER": os.environ.get("DB_USER", "tision"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "tision"),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+        "NAME": config("DB_NAME", default="tision"),
+        "USER": config("DB_USER", default="tision"),
+        "PASSWORD": config("DB_PASSWORD", default="tision"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432", cast=int),
     }
 }
 
 
-# settings.py
+# REST Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -121,6 +125,24 @@ SIMPLE_JWT = {
     # Custom Cookie Names
     "ACCESS_COOKIE": "access_token",
     "REFRESH_COOKIE": "refresh_token",
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Tision Cargo API",
+    "DESCRIPTION": "API documentation for the Tision logistics marketplace and cargo dispatch platform.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    # Adds the JWT bearer authorization UI to Swagger
+    "SECURITY": [{"BearerAuth": []}],
+    "SECURITY_DEFINITIONS": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    },
 }
 
 
@@ -135,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "Name": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
