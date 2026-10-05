@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -12,6 +13,7 @@ class LoginView(APIView):
     A view for user login supporting either email or phone number.
     """
 
+    permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request):

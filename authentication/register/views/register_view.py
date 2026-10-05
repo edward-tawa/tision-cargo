@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.serializers.user_serializers import UserCreateSerializer
 
-# Import your custom response helpers
 from core.api_responses.responses import error_response, success_response
 
 
