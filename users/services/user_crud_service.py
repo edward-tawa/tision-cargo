@@ -12,18 +12,38 @@ class UserCRUDService:
     @staticmethod
     @transaction.atomic
     def create_user(
-        *, email, password, first_name, last_name, age, phone_number, role, status
+        *,
+        email,
+        password,
+        first_name,
+        last_name,
+        age,
+        phone_number,
+        role=None,
+        status=None,
     ):
         """
-        Create a new user with the provided details.
+        Create a new user with the provided details. Defaults will be applied
+        if role or status are not provided.
         """
+        # Build extra_fields dynamically, dropping any None values
+        # so Django's model defaults can kick in safely.
+        extra_fields = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "age": age,
+        }
+
+        if role is not None:
+            extra_fields["role"] = role
+        if status is not None:
+            extra_fields["status"] = status
+
         user = CustomUser.objects.create_user(
             email=email,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
-            age=age,
             phone_number=phone_number,
+            **extra_fields,
         )
         logger.info(f"User created with user id: {user.id}")
         return user
