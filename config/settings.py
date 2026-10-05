@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "core",
     "phonenumber_field",
+    "drf_spectacular",
 ]
 
 
@@ -111,6 +112,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -121,6 +123,24 @@ SIMPLE_JWT = {
     # Custom Cookie Names
     "ACCESS_COOKIE": "access_token",
     "REFRESH_COOKIE": "refresh_token",
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Tision Cargo API",
+    "DESCRIPTION": "API documentation for the Tision logistics marketplace and cargo dispatch platform.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    # Adds the JWT bearer authorization UI to Swagger
+    "SECURITY": [{"BearerAuth": []}],
+    "SECURITY_DEFINITIONS": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    },
 }
 
 
