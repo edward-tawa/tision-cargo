@@ -5,8 +5,10 @@ from rest_framework.response import Response
 
 from core.api_responses.responses import error_response, success_response
 from user_profiles.models.user_profiles_models import ClientProfile, DriverProfile
-
-from user_profiles.serializers.user_profiles_serializers import ClientProfileSerializer, DriverProfileSerializer
+from user_profiles.serializers.user_profiles_serializers import (
+    ClientProfileSerializer,
+    DriverProfileSerializer,
+)
 
 
 class DriverProfileViewSet(viewsets.ModelViewSet):
@@ -38,7 +40,7 @@ class DriverProfileViewSet(viewsets.ModelViewSet):
         """
         profile = self.get_object()
         if profile.user != self.request.user and not self.request.user.is_staff:
-            raise PermissionDenied("You do not have permission to modify this driver profile.")
+            raise error_response("You do not have permission to modify this driver profile.")
         serializer.save()
 
     def perform_destroy(self, instance):
@@ -47,7 +49,7 @@ class DriverProfileViewSet(viewsets.ModelViewSet):
         Only allows a user to delete their own profile, or an admin to do it.
         """
         if instance.user != self.request.user and not self.request.user.is_staff:
-            raise PermissionDenied("You do not have permission to delete this profile.")
+            raise error_response("You do not have permission to delete this profile.")
         instance.delete()
 
 
@@ -71,11 +73,11 @@ class ClientProfileViewSet(viewsets.ModelViewSet):
         """ Explicit UPDATE for Clients """
         profile = self.get_object()
         if profile.user != self.request.user and not self.request.user.is_staff:
-            raise PermissionDenied("You do not have permission to modify this client profile.")
+            raise error_response("You do not have permission to modify this client profile.")
         serializer.save()
 
     def perform_destroy(self, instance):
         """ Explicit DELETE for Clients """
         if instance.user != self.request.user and not self.request.user.is_staff:
-            raise PermissionDenied("You do not have permission to delete this profile.")
+            raise error_response("You do not have permission to delete this profile.")
         instance.delete()
