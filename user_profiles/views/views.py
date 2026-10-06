@@ -3,8 +3,10 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..models.models import ClientProfile, DriverProfile
-from ..serializers.serializers import ClientProfileSerializer, DriverProfileSerializer
+from core.api_responses.responses import error_response, success_response
+from user_profiles.models.user_profiles_models import ClientProfile, DriverProfile
+
+from user_profiles.serializers.user_profiles_serializers import ClientProfileSerializer, DriverProfileSerializer
 
 
 class DriverProfileViewSet(viewsets.ModelViewSet):
