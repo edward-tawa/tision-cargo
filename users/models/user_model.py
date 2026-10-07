@@ -1,6 +1,7 @@
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
+    Group,
     PermissionsMixin,
 )
 from django.db import models
@@ -116,21 +117,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
-        ordering = ["email"]
         permissions = [
             ("can_suspend_user", _("Can suspend user")),
             ("can_verify_user", _("Can verify user")),
             ("can_change_user_role", _("Can change user role")),
-            ("can_change_user_status", _("Can change user status")),
-            ("can_change_user_password", _("Can change user password")),
-            ("can_change_user_email", _("Can change user email")),
-            ("can_change_user_phone_number", _("Can change user phone number")),
-            ("can_change_user_age", _("Can change user age")),
-            ("can_create_bid", _("Can create bid")),
-            ("can_accept_bid", _("Can accept bid")),
-            ("can_reject_bid", _("Can reject bid")),
-            ("can_cancel_bid", _("Can cancel bid")),
-            ("can_complete_bid", _("Can complete bid")),
         ]
 
     def __str__(self):
@@ -141,3 +131,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
     def is_active(self):
         """Return whether the user is active."""
         return self.status == self.STATUS.VERIFIED
+
+    def save(self, *args, **kwargs):
+        # 1. Determine if this is a brand new user
+        is_new = self.pk is None
+
+        # 2. Save the user first so they get a primary key
+        super().save(*args, **kwargs)
+
+        # 3. Only assign the group if this is a brand new user
+        if is_new and self.role:
+            group, _ = Group.objects.get_or_create(name=self.role)
+            self.groups.add(group)
