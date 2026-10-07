@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Group, Permission
 from loguru import logger
-from user.permissions.role_to_permissions import ROLE_TO_PERMISSIONS
+
+from core.permissions.role_to_permissions import ROLE_TO_PERMISSIONS
 
 
 def create_permission_group_mapping():
