@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from user_profiles.views.user_profiles_views import (
+from user_profiles.views.driver_profile_views import (
     DriverProfileViewSet,
 )
 
