@@ -16,8 +16,15 @@ from drf_spectacular.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     # Your application routes
-    path("api/v1/users/", include("users.urls")),
-    # path("api/v1/auth/", include("authentication.urls")),  # Uncomment when you wire up auth URLs
+    path("api/users/", include("users.urls")),
+    path("api/auth/register/", include("authentication.register.urls.register_urls")),
+    path("api/auth/login/", include("authentication.login.urls.login_urls")),
+    path("api/auth/logout/", include("authentication.logout.urls.logout_urls")),
+    path(
+        "api/auth/token/refresh/",
+        include("authentication.refresh_token.urls.refresh_token_urls"),
+    ),
+    path("api/auth/otp/", include("authentication.otp.urls.otp_urls")),
     # --- API Documentation (drf-spectacular) ---
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

@@ -49,18 +49,18 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-    "core",
     "phonenumber_field",
     "drf_spectacular",
 ]
 
 
+LOCAL_APPS = ["users", "core", "authentication", "user_profiles"]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 PHONENUMBER_DEFAULT_REGION = "ZW"  # lets users type local numbers like 0771234567
 PHONENUMBER_DB_FORMAT = "E164"
 
-LOCAL_APPS = ["users"]
-
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -157,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "Name": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
