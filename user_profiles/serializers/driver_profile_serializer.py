@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from user_profiles.models.user_profiles_models import ClientProfile, DriverProfile
+from user_profiles.models.driver_profile_model import DriverProfile
 
 
 class DriverProfileSerializer(serializers.ModelSerializer):
@@ -11,4 +11,3 @@ class DriverProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DriverProfile
         fields = ["user", "license_number", "vehicle_type", "is_available", "rating"]
-

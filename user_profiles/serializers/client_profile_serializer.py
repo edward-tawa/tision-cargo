@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from user_profiles.models.user_profiles_models import ClientProfile, DriverProfile
+from user_profiles.models.client_profile_model import ClientProfile
 
 
 class ClientProfileSerializer(serializers.ModelSerializer):
