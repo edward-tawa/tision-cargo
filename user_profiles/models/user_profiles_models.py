@@ -8,11 +8,12 @@ class DriverProfile(models.Model):
     Profile model for system drivers.
     Primary key is explicitly inherited from the Common User model.
     """
+
     VEHICLE_CHOICES = [
-        ('motorcycle', 'Motorcycle'),
-        ('van', 'Cargo Van'),
-        ('rigid_truck', 'Rigid Truck'),
-        ('articulated_truck', 'Articulated Truck'),
+        ("motorcycle", "Motorcycle"),
+        ("van", "Cargo Van"),
+        ("rigid_truck", "Rigid Truck"),
+        ("articulated_truck", "Articulated Truck"),
     ]
 
     # primary_key=True makes this field the actual PK of this table, matching the User's ID
@@ -20,17 +21,17 @@ class DriverProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='driver_profile'
+        related_name="driver_profile",
     )
     license_number = models.CharField(max_length=50, unique=True, db_index=True)
     vehicle_type = models.CharField(max_length=30, choices=VEHICLE_CHOICES)
     is_available = models.BooleanField(default=True, db_index=True)
     rating = models.DecimalField(
-        max_length=3, 
-        max_digits=3, 
-        decimal_places=2, 
+        max_length=3,
+        max_digits=3,
+        decimal_places=2,
         default=5.00,
-        validators=[MinValueValidator(0.00), MaxValueValidator(5.00)]
+        validators=[MinValueValidator(0.00), MaxValueValidator(5.00)],
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -48,11 +49,12 @@ class ClientProfile(models.Model):
     Profile model for clients who book haulage services.
     Primary key is explicitly inherited from the Common User model.
     """
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
-        related_name='client_profile'
+        related_name="client_profile",
     )
     company_name = models.CharField(max_length=150, blank=True, null=True)
     home_address = models.TextField()

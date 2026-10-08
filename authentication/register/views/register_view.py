@@ -1,44 +1,56 @@
+from django.conf import settings
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from users.serializers.user_serializers import UserCreateSerializer
 
+from authentication.otp.services.otp_service import OTPService
 from core.api_responses.responses import error_response, success_response
+from users.serializers.user_serializer import (
+    CreateUserSerializer,
+    ReadUserSerializer,
+)
 
 
 class RegisterView(APIView):
     """
-    Handle user registration and return JWT tokens upon success using standard response wrappers.
+    Handle user registration, generate an OTP, and return user data and the OTP code upon success.
     """
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=CreateUserSerializer,
+        responses={201: ReadUserSerializer},
+        summary="Register a new user",
+        description="Creates a new user account, generates an OTP, and returns the profile details and OTP code.",
+    )
     def post(self, request):
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = CreateUserSerializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
 
-            # Generate JWT tokens for the newly registered user
-            refresh = RefreshToken.for_user(user)
+            # Generate and dispatch (log/send) the OTP
+            otp_obj = OTPService.generate_and_send_otp(user)
 
-            # Package user data and tokens together for the response data
+            # Serialize the user using ReadUserSerializer for a clean output representation
+            output_serializer = ReadUserSerializer(user)
+
             response_data = {
-                "user": serializer.data,
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
+                "user": output_serializer.data,
             }
 
+            # Include the code in the response during development/testing
+            if settings.DEBUG:
+                response_data["otp_code"] = otp_obj.code
+
             return success_response(
-                message="User registered successfully.",
+                message="User registered successfully. Use the provided OTP to verify your account.",
                 status=status.HTTP_201_CREATED,
                 data=response_data,
             )
 
-        # Return validation errors neatly using your error wrapper
         return error_response(
             message="Registration failed due to validation errors.",
             status=status.HTTP_400_BAD_REQUEST,

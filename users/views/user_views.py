@@ -15,8 +15,6 @@ from users.serializers.user_serializer import (
 from users.services.user_business_service import UserBusinessService
 from users.services.user_crud_service import UserCRUDService
 
-from ..core.api_responses.responses import success_response
-
 
 class UserViewSet(viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
