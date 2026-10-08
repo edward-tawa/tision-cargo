@@ -42,4 +42,3 @@ class DriverProfile(models.Model):
 
     def __str__(self):
         return f"Driver Profile: {self.user.email if hasattr(self.user, 'email') else self.user.username}"
-
