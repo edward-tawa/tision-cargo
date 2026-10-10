@@ -1,4 +1,4 @@
-# core/responses.py
+# core/api_responses/responses.py
 from rest_framework.response import Response
 
 

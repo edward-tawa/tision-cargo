@@ -54,7 +54,7 @@ THIRD_PARTY_APPS = [
 ]
 
 
-LOCAL_APPS = ["users", "core", "authentication", "user_profiles"]
+LOCAL_APPS = ["users", "core", "authentication", "user_profiles", "bids"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -111,6 +111,7 @@ DATABASES = {
 
 # REST Framework settings
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
