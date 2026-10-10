@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -15,7 +14,6 @@ class ClientProfile(models.Model):
         primary_key=True,
         related_name="client_profile",
     )
-    company_name = models.CharField(max_length=150, blank=True, null=True)
     home_address = models.TextField()
     phone_number = models.CharField(max_length=20, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,4 +24,4 @@ class ClientProfile(models.Model):
         verbose_name_plural = "Client Profiles"
 
     def __str__(self):
-        return f"Client Profile: {self.company_name or (self.user.email if hasattr(self.user, 'email') else self.user.username)}"
+        return f"Client Profile: {(self.user.email if hasattr(self.user, 'email') else self.user.username)}"
