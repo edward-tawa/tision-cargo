@@ -21,7 +21,7 @@ urlpatterns = [
     path("api/auth/login/", include("authentication.login.urls.login_urls")),
     path("api/auth/logout/", include("authentication.logout.urls.logout_urls")),
     path("user_profiles/clients", include("user_profiles.urls.client_profile_urls")),
-    path("user_profiles/drivers", include("user_profiles.urls.drivers_profile_urls")),
+    path("user_profiles/drivers", include("user_profiles.urls.driver_profile_urls")),
     path(
         "api/auth/token/refresh/",
         include("authentication.refresh_token.urls.refresh_token_urls"),
