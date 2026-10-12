@@ -1,10 +1,12 @@
 # bids/views/bid_views.py
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 
 from bids.models.bid_model import Bid
 from bids.serializers.bid_serializer import BidSerializer
+from bids.services.bid_business_service import BidBusinessService
 from bids.services.bid_crud_service import BidCRUDService
-from core.api_responses.responses import success_response
+from core.api_responses.responses import error_response, success_response
 
 
 class BidViewSet(viewsets.GenericViewSet):
@@ -73,5 +75,44 @@ class BidViewSet(viewsets.GenericViewSet):
         BidCRUDService.delete_bid(bid_id=pk)
         return success_response(
             message="Bid deleted successfully.",
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["post"], url_path="accept-application")
+    def accept_bid_application(self, request, pk=None):
+        """
+        Endpoint for a client to accept a specific driver application.
+        Payload: { "application_id": 123 }
+        """
+        application_id = request.data.get("application_id")
+        if not application_id:
+            return error_response(
+                message="application_id is required in the request body.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Calls our atomic business service
+        bid = BidBusinessService.accept_driver_bid_application(
+            bid_id=pk,
+            application_id=application_id,
+            user=request.user,
+        )
+
+        return success_response(
+            message="Driver application accepted successfully. Job assigned.",
+            data=BidSerializer(bid).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["post"], url_path="cancel")
+    def cancel_bid(self, request, pk=None):
+        """
+        Endpoint for a client to cancel an open or assigned job.
+        """
+        bid = BidBusinessService.cancel_bid(bid_id=pk, user=request.user)
+
+        return success_response(
+            message="Bid cancelled successfully.",
+            data=BidSerializer(bid).data,
             status=status.HTTP_200_OK,
         )

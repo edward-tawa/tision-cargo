@@ -7,7 +7,7 @@ from user_profiles.models.driver_profile_model import DriverProfile
 from user_profiles.serializers.driver_profile_serializer import (
     DriverProfileSerializer,
 )
-from user_profiles.services.user_profiles_crud_service import UserProfilesCRUDService
+from user_profiles.services.driver_profile_crud_service import DriverProfileCRUDService
 
 
 class DriverProfileViewSet(viewsets.GenericViewSet):
@@ -33,7 +33,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_driver_profile_by_id(pk)
+            profile = DriverProfileCRUDService.get_driver_profile_by_id(pk)
 
             # Authorization verification check
             if profile.user != request.user and not request.user.is_staff:
@@ -56,7 +56,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = UserProfilesCRUDService.create_driver_profile(
+        profile = DriverProfileCRUDService.create_driver_profile(
             user_id=user_id, **serializer.validated_data
         )
         return success_response(
@@ -67,7 +67,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
 
     def partial_update(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_driver_profile_by_id(pk)
+            profile = DriverProfileCRUDService.get_driver_profile_by_id(pk)
 
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
@@ -78,7 +78,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
             serializer = self.get_serializer(profile, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
 
-            updated_profile = UserProfilesCRUDService.update_driver_profile(
+            updated_profile = DriverProfileCRUDService.update_driver_profile(
                 pk, **serializer.validated_data
             )
             return success_response(
@@ -92,7 +92,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
 
     def destroy(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_driver_profile_by_id(pk)
+            profile = DriverProfileCRUDService.get_driver_profile_by_id(pk)
 
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
@@ -100,7 +100,7 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
 
-            UserProfilesCRUDService.delete_driver_profile(pk)
+            DriverProfileCRUDService.delete_driver_profile(pk)
             return success_response("Driver profile deleted successfully.")
         except DriverProfile.DoesNotExist:
             return error_response(

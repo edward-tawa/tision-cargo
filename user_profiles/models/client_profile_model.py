@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+from core.models.time_stamp_model import TimeStampModel
 
-class ClientProfile(models.Model):
+
+class ClientProfile(TimeStampModel):
     """
     Profile model for clients who book haulage services.
     Primary key is explicitly inherited from the Common User model.
@@ -14,14 +16,18 @@ class ClientProfile(models.Model):
         primary_key=True,
         related_name="client_profile",
     )
-    home_address = models.TextField()
-    phone_number = models.CharField(max_length=20, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    # Optional: Great if your haulage service handles business-to-business (B2B) clients
+    company_name = models.CharField(max_length=150, blank=True)
+
+    # Generalized address for pickup/billing reference
+    default_address = models.TextField(
+        blank=True, help_text="Default address for pickup or billing reference."
+    )
 
     class Meta:
         verbose_name = "Client Profile"
         verbose_name_plural = "Client Profiles"
 
     def __str__(self):
-        return f"Client Profile: {(self.user.email if hasattr(self.user, 'email') else self.user.username)}"
+        return f"Client Profile: {self.user.email}"
