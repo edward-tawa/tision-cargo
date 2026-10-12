@@ -7,7 +7,7 @@ from user_profiles.models.driver_profile_model import DriverProfile
 User = get_user_model()
 
 
-class DriverProfilesCRUDService:
+class DriverProfileCRUDService:
     """
     A service class for managing driver profiles, enhanced with Loguru logging.
     """

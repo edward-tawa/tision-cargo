@@ -7,7 +7,7 @@ from user_profiles.models.client_profile_model import ClientProfile
 from user_profiles.serializers.client_profile_serializer import (
     ClientProfileSerializer,
 )
-from user_profiles.services.user_profiles_crud_service import UserProfilesCRUDService
+from user_profiles.services.client_profile_crud_service import ClientProfileCRUDService
 
 
 class ClientProfileViewSet(viewsets.GenericViewSet):
@@ -30,7 +30,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_client_profile_by_id(pk)
+            profile = ClientProfileCRUDService.get_client_profile_by_id(pk)
 
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
@@ -52,7 +52,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = UserProfilesCRUDService.create_client_profile(
+        profile = ClientProfileCRUDService.create_client_profile(
             user_id=user_id, **serializer.validated_data
         )
         return success_response(
@@ -63,7 +63,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
 
     def partial_update(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_client_profile_by_id(pk)
+            profile = ClientProfileCRUDService.get_client_profile_by_id(pk)
 
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
@@ -74,7 +74,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
             serializer = self.get_serializer(profile, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
 
-            updated_profile = UserProfilesCRUDService.update_client_profile(
+            updated_profile = ClientProfileCRUDService.update_client_profile(
                 pk, **serializer.validated_data
             )
             return success_response(
@@ -88,7 +88,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
 
     def destroy(self, request, pk=None):
         try:
-            profile = UserProfilesCRUDService.get_client_profile_by_id(pk)
+            profile = ClientProfileCRUDService.get_client_profile_by_id(pk)
 
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
@@ -96,7 +96,7 @@ class ClientProfileViewSet(viewsets.GenericViewSet):
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
 
-            UserProfilesCRUDService.delete_client_profile(pk)
+            ClientProfileCRUDService.delete_client_profile(pk)
             return success_response("Client profile deleted successfully.")
         except ClientProfile.DoesNotExist:
             return error_response(

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from core.models.time_stamp_model import TimeStampModel
@@ -6,35 +7,34 @@ from core.models.time_stamp_model import TimeStampModel
 
 class Bid(TimeStampModel):
     class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        ACCEPTED = "accepted", "Accepted"
-        REJECTED = "rejected", "Rejected"
+        OPEN = "open", "Open"  # Waiting for drivers
+        ASSIGNED = "assigned", "Assigned"  # Driver accepted/assigned
         COMPLETED = "completed", "Completed"
         CANCELLED = "cancelled", "Cancelled"
 
+    # The client who posted the haulage job and set the budget/amount
     client = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="bids",
+        on_delete=models.CASCADE,
+        related_name="client_bids",
     )
-    driver = models.ForeignKey(
+
+    # The winning driver (filled once a driver is assigned)
+    assigned_driver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="assigned_rides",
+        related_name="accepted_jobs",
     )
-    bid_id = models.AutoField(primary_key=True)
-    bid_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+    bid_amount = models.DecimalField(max_digits=10, decimal_places=2)
     bid_status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
+        max_length=20, choices=Status.choices, default=Status.OPEN
     )
 
     # Fixed / Static Locations
-    pickup_address = models.CharField(max_length=255, blank=True)
+    pickup_address = models.CharField(max_length=255)
     pickup_lat = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
@@ -42,7 +42,7 @@ class Bid(TimeStampModel):
         max_digits=9, decimal_places=6, null=True, blank=True
     )
 
-    destination_address = models.CharField(max_length=255, blank=True)
+    destination_address = models.CharField(max_length=255)
     destination_lat = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
@@ -50,9 +50,9 @@ class Bid(TimeStampModel):
         max_digits=9, decimal_places=6, null=True, blank=True
     )
 
-    # NEW: Goods / Cargo details (up to 3 items)
-    good_1_description = models.CharField(max_length=255, blank=True)
-    good_1_quantity = models.PositiveIntegerField(default=1, blank=True)
+    # Goods / Cargo details
+    good_1_description = models.CharField(max_length=255)
+    good_1_quantity = models.PositiveIntegerField(default=1)
 
     good_2_description = models.CharField(max_length=255, blank=True)
     good_2_quantity = models.PositiveIntegerField(default=1, blank=True, null=True)
@@ -61,10 +61,21 @@ class Bid(TimeStampModel):
     good_3_quantity = models.PositiveIntegerField(default=1, blank=True, null=True)
 
     def __str__(self):
-        return f"Bid {self.bid_number} - Amount: {self.bid_amount} - Status: {self.bid_status}"
+        return (
+            f"Job #{self.id} by Client {self.client.email} - Amount: ${self.bid_amount}"
+        )
 
-    @property
-    def bid_number(self):
-        if self.bid_id:
-            return f"BID-{self.bid_id:05d}"
-        return "BID-NEW"
+    def clean(self):
+        super().clean()
+        # Prevent a client from assigning themselves as the driver
+        if self.assigned_driver and self.client == self.assigned_driver:
+            raise ValidationError(
+                {
+                    "assigned_driver": "A client cannot be assigned as the driver for their own job."
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        # Ensure clean() runs even when saving via code/services
+        self.full_clean()
+        super().save(*args, **kwargs)
