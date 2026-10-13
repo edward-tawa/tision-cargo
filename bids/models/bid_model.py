@@ -14,9 +14,11 @@ class Bid(TimeStampModel):
 
     # The client who posted the haulage job and set the budget/amount
     client = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        "user_profiles.ClientProfile",  # Or your specific client reference string
         on_delete=models.CASCADE,
-        related_name="client_bids",
+        related_name="bids",
+        null=True,  # <-- Add this to allow empty values
+        blank=True,  # <-- Add this for form validation flexibility
     )
 
     # The winning driver (filled once a driver is assigned)
