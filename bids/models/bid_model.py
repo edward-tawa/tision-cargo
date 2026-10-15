@@ -12,18 +12,22 @@ class Bid(TimeStampModel):
         REJECTED = "rejected", "Rejected"
         CANCELLED = "cancelled", "Cancelled"
 
-    # The booking this bid is being submitted for
-    booking = models.ForeignKey(
-        "bookings.Booking",
+    # The client who posted the haulage job and set the budget/amount
+    client = models.ForeignKey(
+        "user_profiles.ClientProfile",  # Or your specific client reference string
         on_delete=models.CASCADE,
         related_name="bids",
+        null=True,  # <-- Add this to allow empty values
+        blank=True,  # <-- Add this for form validation flexibility
     )
 
-    # The driver submitting the price offer
-    driver = models.ForeignKey(
+    # The winning driver (filled once a driver is assigned)
+    assigned_driver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="driver_bids",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="accepted_jobs",
     )
 
     # The price proposed by the driver

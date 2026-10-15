@@ -2,7 +2,7 @@
 URL configuration for config project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.1/topics/http/urls/
+    https://djangoproject.com
 """
 
 from django.contrib import admin
@@ -15,7 +15,9 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Your application routes
+    # --- Truck Fleet Routing Layout ---
+    path("api/trucks/", include("trucks.urls.truck_urls")),
+    # --- Application Routes ---
     path("api/users/", include("users.urls")),
     path("api/auth/register/", include("authentication.register.urls.register_urls")),
     path("api/auth/login/", include("authentication.login.urls.login_urls")),
