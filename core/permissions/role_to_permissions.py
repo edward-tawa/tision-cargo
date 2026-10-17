@@ -27,6 +27,11 @@ ROLE_TO_PERMISSIONS = {
         "profiles.view_client_profile",
         "profiles.change_client_profile",
         "profiles.delete_client_profile",
+        # Full control over payments
+        "payments.view_transaction",
+        "payments.change_transaction",
+        "payments.can_refund_transaction",
+        "payments.can_view_analytics",
     ],
     "driver": [
         # Drivers can create, cancel, and complete bids
@@ -39,6 +44,10 @@ ROLE_TO_PERMISSIONS = {
         "profiles.view_driver_profile",
         "profiles.change_driver_profile",
         "profiles.delete_driver_profile",
+        # control over payments
+        "payments.add_transaction",
+        "payments.view_transaction",
+        "payments.can_initiate_payment",
     ],
     "client": [
         # Clients can create, accept, reject, and cancel bids on their requests
