@@ -1,0 +1,3 @@
+from notifications.urls.notification_urls import urlpatterns as notification_urlpatterns
+
+urlpatterns = notification_urlpatterns
