@@ -48,5 +48,16 @@ class Trip(TimeStampModel):
     )
     last_location_update = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        ordering = ["-created_at"]
+        permissions = [
+            ("can_update_trip_status", "Can update the status of a trip"),
+            ("can_view_trip_location", "Can view the real-time location of a trip"),
+            ("can_cancel_trip", "Can cancel a trip"),
+            ("can_view_trip", "Can view a trip"),
+            ("can_delete_trip", "Can delete a trip"),
+            ("can_create_trip", "Can create a trip"),
+        ]
+
     def __str__(self):
         return f"Trip #{self.id} for Bid #{self.bid.id} - Status: {self.trip_status}"

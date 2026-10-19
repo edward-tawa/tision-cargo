@@ -22,8 +22,14 @@ urlpatterns = [
     path("api/auth/register/", include("authentication.register.urls.register_urls")),
     path("api/auth/login/", include("authentication.login.urls.login_urls")),
     path("api/auth/logout/", include("authentication.logout.urls.logout_urls")),
-    path("user_profiles/clients", include("user_profiles.urls.client_profile_urls")),
-    path("user_profiles/drivers", include("user_profiles.urls.driver_profile_urls")),
+    path(
+        "api/user_profiles/clients", include("user_profiles.urls.client_profile_urls")
+    ),
+    path(
+        "api/user_profiles/drivers", include("user_profiles.urls.driver_profile_urls")
+    ),
+    path("api/bookings/", include("bookings.urls.booking_urls")),
+    path("api/bids/", include("bids.urls.bid_urls")),
     path(
         "api/auth/token/refresh/",
         include("authentication.refresh_token.urls.refresh_token_urls"),

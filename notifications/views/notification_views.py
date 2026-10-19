@@ -1,5 +1,6 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 
 from core.api_responses.responses import success_response
 from notifications.models import Notification
@@ -56,10 +57,8 @@ class NotificationViewSet(viewsets.GenericViewSet):
         """
         notification = NotificationCRUDService.get_notification(notification_id=pk)
 
-        # Ownership check
+        # Ownership check / Permission check
         if notification.recipient != request.user and not request.user.is_staff:
-            from rest_framework.exceptions import PermissionDenied
-
             raise PermissionDenied(
                 "You do not have permission to view this notification."
             )

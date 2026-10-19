@@ -49,6 +49,11 @@ class Notification(TimeStampModel):
             models.Index(fields=["recipient", "created_at"]),
             models.Index(fields=["recipient", "is_read"]),
         ]
+        permissions = [
+            ("can_create_notification", "Can create a notification"),
+            ("can_read_notification", "Can read a notification"),
+            ("can_delete_notification", "Can delete a notification"),
+        ]
 
     def __str__(self):
         return f"Notification {self.id} for User {self.recipient_id}"

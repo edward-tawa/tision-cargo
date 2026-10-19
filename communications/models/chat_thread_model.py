@@ -45,5 +45,11 @@ class ChatThread(TimeStampModel):
             models.Index(fields=["driver"]),
         ]
 
+        permissions = [
+            ("can_create_thread", "Can create a chat thread"),
+            ("can_read_thread", "Can read a chat thread"),
+            ("can_delete_thread", "Can delete a chat thread"),
+        ]
+
     def __str__(self):
         return f"ChatThread ({self.id}) - Booking: {self.booking_id}"

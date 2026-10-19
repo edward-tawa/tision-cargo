@@ -28,6 +28,11 @@ class ChatMessage(TimeStampModel):
         indexes = [
             models.Index(fields=["thread", "created_at"]),
         ]
+        permissions = [
+            ("can_send_message", "Can send a message"),
+            ("can_read_message", "Can read a message"),
+            ("can_delete_message", "Can delete a message"),
+        ]
 
     def __str__(self):
         return f"Message {self.id} by User {self.sender_id} in Thread {self.thread_id}"

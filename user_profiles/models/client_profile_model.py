@@ -28,6 +28,12 @@ class ClientProfile(TimeStampModel):
     class Meta:
         verbose_name = "Client Profile"
         verbose_name_plural = "Client Profiles"
+        permissions = [
+            ("can_create_client_profile", "Can create a client profile"),
+            ("can_read_client_profile", "Can read a client profile"),
+            ("can_update_client_profile", "Can update a client profile"),
+            ("can_delete_client_profile", "Can delete a client profile"),
+        ]
 
     def __str__(self):
         return f"Client Profile: {self.user.email}"

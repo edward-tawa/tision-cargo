@@ -43,6 +43,17 @@ class Bid(TimeStampModel):
     def __str__(self):
         return f"Bid #{self.id} by Driver {self.driver.email} for Booking #{self.booking.id} - Amount: ${self.bid_amount}"
 
+    class Meta:
+        permissions = [
+            ("can_create_bid", "Can create a bid"),
+            ("can_accept_bid", "Can accept a bid"),
+            ("can_reject_bid", "Can reject a bid"),
+            ("can_cancel_bid", "Can cancel a bid"),
+            ("can_complete_bid", "Can complete a bid"),
+            ("can_view_bid", "Can view bids"),
+            ("can_delete_bid", "Can delete bids"),
+        ]
+
     def clean(self):
         super().clean()
         # Ensure a driver can't bid on a booking posted by themselves (if drivers can also be clients)

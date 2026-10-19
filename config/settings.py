@@ -60,6 +60,10 @@ LOCAL_APPS = [
     "authentication",
     "user_profiles",
     "bids",
+    "trips",
+    "communications",
+    "notifications",
+    "bookings",
     "trucks",
     "payments",
 ]

@@ -55,6 +55,12 @@ class DriverProfile(TimeStampModel):
     class Meta:
         verbose_name = "Driver Profile"
         verbose_name_plural = "Driver Profiles"
+        permissions = [
+            ("can_create_driver_profile", "Can create a driver profile"),
+            ("can_read_driver_profile", "Can read a driver profile"),
+            ("can_update_driver_profile", "Can update a driver profile"),
+            ("can_delete_driver_profile", "Can delete a driver profile"),
+        ]
 
     def __str__(self):
         return f"Driver Profile: {self.user.email}"

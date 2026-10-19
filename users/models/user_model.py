@@ -121,6 +121,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, TimeStampModel):
             ("can_suspend_user", _("Can suspend user")),
             ("can_verify_user", _("Can verify user")),
             ("can_change_user_role", _("Can change user role")),
+            ("can_create_user", _("Can create a user")),
+            ("can_read_user", _("Can read user details")),
+            ("can_update_user", _("Can update user details")),
+            ("can_delete_user", _("Can delete a user")),
         ]
 
     def __str__(self):

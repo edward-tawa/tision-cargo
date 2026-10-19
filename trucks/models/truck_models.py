@@ -208,6 +208,16 @@ class Truck(models.Model):
             models.Index(fields=["operation_status"]),
         ]
 
+        permissions = [
+            ("can_add_truck", "Can add a new truck"),
+            ("can_update_truck", "Can update truck details"),
+            ("can_delete_truck", "Can delete a truck"),
+            ("can_verify_truck", "Can verify truck compliance"),
+            ("can_change_truck_status", "Can change truck operational status"),
+            ("can_create_truck", "Can create a truck"),
+            ("can_read_truck", "Can read truck details"),
+        ]
+
     def __str__(self):
         return f"{self.make} {self.model} [{self.license_plate_number}]"
 
@@ -256,6 +266,15 @@ class TruckDocument(models.Model):
         verbose_name = "Truck Document"
         verbose_name_plural = "Truck Documents"
         ordering = ["-expiry_date"]
+
+        permissions = [
+            ("can_add_truck_document", "Can add a new truck document"),
+            ("can_update_truck_document", "Can update truck document details"),
+            ("can_delete_truck_document", "Can delete a truck document"),
+            ("can_verify_truck_document", "Can verify truck document compliance"),
+            ("can_create_truck_document", "Can create a truck document"),
+            ("can_read_truck_document", "Can read truck document details"),
+        ]
 
     def __str__(self):
         return f"{self.get_document_type_display()} for Truck: {self.truck.license_plate_number}"

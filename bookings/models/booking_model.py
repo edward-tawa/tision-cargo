@@ -76,6 +76,17 @@ class Booking(TimeStampModel):
                 }
             )
 
+    class Meta:
+        permissions = [
+            ("can_create_booking", "Can create a booking"),
+            ("can_accept_booking", "Can accept a booking"),
+            ("can_reject_booking", "Can reject a booking"),
+            ("can_cancel_booking", "Can cancel a booking"),
+            ("can_complete_booking", "Can complete a booking"),
+            ("can_view_booking", "Can view bookings"),
+            ("can_delete_booking", "Can delete bookings"),
+        ]
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
