@@ -10,7 +10,8 @@ from core.api_responses.responses import success_response
 from core.permissions.core_permissions import CorePermission
 
 # Local App Architecture Components
-from trucks.models.truck_models import Truck, TruckType
+from trucks.models.truck_model import Truck
+from trucks.models.truck_type_model import TruckType
 from trucks.serializers.truck_serializer import (
     TruckCreateSerializer,
     TruckDocumentSerializer,

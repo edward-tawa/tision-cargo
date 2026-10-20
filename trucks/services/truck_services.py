@@ -8,7 +8,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 # Core App Architectures & Modules Integrations
 # (Derived from custom responses, exception handlers, and user systems)
 from core.exceptions.custom_exception_handler import custom_exception_handler
-from trucks.models.truck_models import Truck, TruckDocument, TruckInsurance
+from trucks.models.truck_document_model import TruckDocument
+from trucks.models.truck_insurance_model import TruckInsurance
+from trucks.models.truck_model import Truck
 
 
 class TruckComplianceService:
