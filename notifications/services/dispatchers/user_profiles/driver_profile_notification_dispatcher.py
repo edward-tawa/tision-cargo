@@ -1,7 +1,7 @@
-# notifications/services/dispatchers/driver_notifications.py
+# notifications/services/dispatchers/user_profiles/driver_profile_notification_dispatcher.py
 from loguru import logger
 
-from notifications.services.crud import NotificationCRUDService
+from notifications.services.notification_crud_service import NotificationCRUDService
 
 
 class DriverProfileNotificationDispatcher:

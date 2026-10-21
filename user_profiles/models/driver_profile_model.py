@@ -7,8 +7,7 @@ from core.models.time_stamp_model import TimeStampModel
 
 class DriverProfile(TimeStampModel):
     """
-    Profile model for system drivers.
-    Primary key is explicitly inherited from the Common User model.
+    Profile model for system drivers, equipped with a dedicated UUID primary key.
     """
 
     class VehicleType(models.TextChoices):
@@ -18,11 +17,9 @@ class DriverProfile(TimeStampModel):
         TRUCK_7T = "7_TONNE", "7 Tonne truck"
         TIPPER = "TIPPER", "Tipper truck"
 
-    # primary_key=True makes this field the actual PK of this table, matching the User's ID
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        primary_key=True,
         related_name="driver_profile",
     )
 
@@ -44,7 +41,6 @@ class DriverProfile(TimeStampModel):
     completed_trips_count = models.PositiveIntegerField(default=0)
     is_available = models.BooleanField(default=True, db_index=True)
 
-    # Removed invalid max_length=3 for DecimalField
     rating = models.DecimalField(
         max_digits=3,
         decimal_places=2,

@@ -16,7 +16,8 @@ class DriverProfileCRUDService:
     def get_driver_profile_by_id(profile_id):
         logger.info(f"Fetching driver profile with ID: {profile_id}")
         try:
-            profile = DriverProfile.objects.get(id=profile_id)
+            # Fixed: Use pk=profile_id since 'user' is the primary key
+            profile = DriverProfile.objects.select_related("user").get(pk=profile_id)
             logger.debug(
                 f"Successfully fetched driver profile for user: {profile.user.email}"
             )
@@ -35,9 +36,9 @@ class DriverProfileCRUDService:
         vehicle_reg_number,
         make_and_model,
         max_weight_kg,
-        vehicle_front_photo,
-        vehicle_rear_photo,
-        vehicle_side_photo,
+        vehicle_front_photo=None,
+        vehicle_rear_photo=None,
+        vehicle_side_photo=None,
     ):
         logger.info(f"Attempting to create driver profile for user ID: {user_id}")
 
@@ -75,7 +76,7 @@ class DriverProfileCRUDService:
         )
 
         try:
-            profile = DriverProfile.objects.get(id=profile_id)
+            profile = DriverProfile.objects.get(pk=profile_id)
         except DriverProfile.DoesNotExist:
             logger.error(
                 f"Failed to update: Driver profile with ID {profile_id} not found."
@@ -95,7 +96,7 @@ class DriverProfileCRUDService:
         logger.warning(f"Attempting to delete driver profile ID: {profile_id}")
 
         try:
-            profile = DriverProfile.objects.get(id=profile_id)
+            profile = DriverProfile.objects.get(pk=profile_id)
         except DriverProfile.DoesNotExist:
             logger.error(
                 f"Failed to delete: Driver profile with ID {profile_id} not found."

@@ -140,13 +140,13 @@ class BookingCRUDService:
             "good_3_quantity": good_3_quantity,
         }
 
-        # Filter out None values so we only modify fields that were explicitly provided
         fields_to_update = {k: v for k, v in update_data.items() if v is not None}
 
         for key, value in fields_to_update.items():
             setattr(booking, key, value)
 
         booking.save()
+
         logger.success(f"Booking #{booking.id} successfully updated.")
         return booking
 

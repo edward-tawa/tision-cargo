@@ -9,14 +9,15 @@ User = get_user_model()
 
 class ClientProfileCRUDService:
     """
-    A service class for managing client profiles, enhanced with Loguru logging.
+    A service class for managing client profiles data operations.
     """
 
     @staticmethod
     def get_client_profile_by_id(profile_id):
         logger.info(f"Fetching client profile with ID: {profile_id}")
         try:
-            profile = ClientProfile.objects.get(id=profile_id)
+            # Fixed: Use pk=profile_id since 'user' is the primary key
+            profile = ClientProfile.objects.select_related("user").get(pk=profile_id)
             logger.debug(
                 f"Successfully fetched client profile for user: {profile.user.email}"
             )
@@ -42,9 +43,7 @@ class ClientProfileCRUDService:
             user=user, default_address=default_address, company_name=company_name
         )
 
-        logger.success(
-            f"Client profile successfully created for user: {user.email} (ID: {user_id})"
-        )
+        logger.success(f"Client profile successfully created for user: {user.email}")
         return profile
 
     @staticmethod
@@ -56,7 +55,7 @@ class ClientProfileCRUDService:
         )
 
         try:
-            profile = ClientProfile.objects.get(id=profile_id)
+            profile = ClientProfile.objects.get(pk=profile_id)
         except ClientProfile.DoesNotExist:
             logger.error(
                 f"Failed to update: Client profile with ID {profile_id} not found."
@@ -76,7 +75,7 @@ class ClientProfileCRUDService:
         logger.warning(f"Attempting to delete client profile ID: {profile_id}")
 
         try:
-            profile = ClientProfile.objects.get(id=profile_id)
+            profile = ClientProfile.objects.get(pk=profile_id)
         except ClientProfile.DoesNotExist:
             logger.error(
                 f"Failed to delete: Client profile with ID {profile_id} not found."

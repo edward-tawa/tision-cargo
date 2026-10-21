@@ -1,7 +1,7 @@
 # trips/services/dispatchers/trip_notifications.py
 from loguru import logger
 
-from notifications.services.crud import NotificationCRUDService
+from notifications.services.notification_crud_service import NotificationCRUDService
 
 
 class TripNotificationDispatcher:

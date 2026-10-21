@@ -92,13 +92,13 @@ class BidCRUDService:
             "driver_notes": driver_notes,
         }
 
-        # Filter out None values so we only modify fields that were explicitly provided
         fields_to_update = {k: v for k, v in update_data.items() if v is not None}
 
         for key, value in fields_to_update.items():
             setattr(bid, key, value)
 
         bid.save()
+
         logger.success(f"Bid #{bid.id} successfully updated.")
         return bid
 

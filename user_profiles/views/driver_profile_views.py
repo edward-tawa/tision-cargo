@@ -1,4 +1,3 @@
-# user_profiles/views/user_profiles_views.py
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -6,6 +5,9 @@ from core.api_responses.responses import error_response, success_response
 from user_profiles.models.driver_profile_model import DriverProfile
 from user_profiles.serializers.driver_profile_serializer import (
     DriverProfileSerializer,
+)
+from user_profiles.services.driver_profile_business_service import (
+    DriverProfileBusinessService,
 )
 from user_profiles.services.driver_profile_crud_service import DriverProfileCRUDService
 
@@ -35,7 +37,6 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
         try:
             profile = DriverProfileCRUDService.get_driver_profile_by_id(pk)
 
-            # Authorization verification check
             if profile.user != request.user and not request.user.is_staff:
                 return error_response(
                     "You do not have permission to view this driver profile.",
@@ -56,7 +57,8 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = DriverProfileCRUDService.create_driver_profile(
+        # Updated to call the Business Service workflow
+        profile = DriverProfileBusinessService.create_driver_profile_workflow(
             user_id=user_id, **serializer.validated_data
         )
         return success_response(
@@ -65,7 +67,13 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    def update(self, request, pk=None):
+        return self._update_profile(request, pk, partial=False)
+
     def partial_update(self, request, pk=None):
+        return self._update_profile(request, pk, partial=True)
+
+    def _update_profile(self, request, pk, partial):
         try:
             profile = DriverProfileCRUDService.get_driver_profile_by_id(pk)
 
@@ -75,7 +83,9 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
 
-            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            serializer = self.get_serializer(
+                profile, data=request.data, partial=partial
+            )
             serializer.is_valid(raise_exception=True)
 
             updated_profile = DriverProfileCRUDService.update_driver_profile(
@@ -104,8 +114,5 @@ class DriverProfileViewSet(viewsets.GenericViewSet):
             return success_response("Driver profile deleted successfully.")
         except DriverProfile.DoesNotExist:
             return error_response(
-                "Driver profile not found.",
-                status_code=status.HTTP_444_NOT_FOUND
-                if hasattr(status, "HTTP_444_NOT_FOUND")
-                else status.HTTP_404_NOT_FOUND,
+                "Driver profile not found.", status_code=status.HTTP_404_NOT_FOUND
             )

@@ -2,6 +2,9 @@
 from django.db import transaction
 from django.utils import timezone
 from loguru import logger
+from notifications.services.dispatchers.trips.trip_notification_dispatcher import (
+    TripNotificationDispatcher,
+)
 from rest_framework.exceptions import ValidationError
 
 from trips.models.trip_model import Trip
@@ -57,6 +60,11 @@ class TripBusinessService:
             driver=driver,
             client=client,
             trip_status=Trip.Status.EN_ROUTE_TO_PICKUP,
+        )
+
+        # 4. Trigger initial trip notification (passing None or initial state)
+        TripNotificationDispatcher.send_trip_status_change_notification(
+            trip, old_status=None, new_status=trip.trip_status
         )
 
         logger.success(
@@ -116,6 +124,11 @@ class TripBusinessService:
 
         trip.trip_status = new_status
         trip.save(update_fields=["trip_status", "updated_at"])
+
+        # Notify relevant parties about the status change
+        TripNotificationDispatcher.send_trip_status_change_notification(
+            trip, old_status=current_status, new_status=new_status
+        )
 
         logger.success(f"Trip #{trip.id} status successfully updated to {new_status}.")
         return trip

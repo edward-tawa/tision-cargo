@@ -5,6 +5,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from bids.models.bid_model import Bid
 from bids.services.bid_crud_service import BidCRUDService
 from bookings.services.booking_crud_service import BookingCRUDService
+from notifications.services.dispatchers.bids.bid_notification_dispatcher import (
+    BidNotificationDispatcher,
+)
 
 
 class BidBusinessService:
@@ -44,7 +47,7 @@ class BidBusinessService:
                 {"detail": "This booking is no longer open for bidding."}
             )
 
-        # 2. Prevent a driver from bidding on their own booking (if drivers can also act as clients)
+        # 2. Prevent a driver from bidding on their own booking
         if booking.client == driver:
             logger.warning(
                 f"Driver #{driver.id} attempted to bid on their own booking #{booking_id}"
@@ -75,6 +78,9 @@ class BidBusinessService:
             bid_amount=bid_amount,
             driver_notes=driver_notes,
         )
+
+        # 5. Trigger notification to the client
+        BidNotificationDispatcher.send_new_bid_notification(bid)
 
         logger.success(
             f"Bid #{bid.id} successfully created by Driver #{driver.id} for Booking #{booking.id}"
@@ -115,11 +121,19 @@ class BidBusinessService:
                 }
             )
 
+        old_amount = bid.bid_amount
+
         updated_bid = BidCRUDService.update_bid(
             bid_id=bid_id,
             bid_amount=bid_amount,
             driver_notes=driver_notes,
         )
+
+        # 3. Trigger amount update notification if amount changed
+        if bid_amount is not None and old_amount != bid_amount:
+            BidNotificationDispatcher.send_bid_amount_updated_notification(
+                updated_bid, old_amount=old_amount, new_amount=bid_amount
+            )
 
         logger.success(f"Bid #{bid.id} successfully updated by Driver #{driver.id}")
         return updated_bid
@@ -148,9 +162,16 @@ class BidBusinessService:
                 }
             )
 
+        old_status = bid.bid_status
+
         cancelled_bid = BidCRUDService.update_bid(
             bid_id=bid_id,
             bid_status=Bid.Status.CANCELLED,
+        )
+
+        # Trigger status change notification
+        BidNotificationDispatcher.send_bid_status_change_notification(
+            cancelled_bid, old_status=old_status, new_status=cancelled_bid.bid_status
         )
 
         logger.success(f"Bid #{bid.id} cancelled successfully.")

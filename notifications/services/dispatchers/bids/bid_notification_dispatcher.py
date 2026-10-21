@@ -1,7 +1,7 @@
 # notifications/services/dispatchers/bid_notifications.py
 from loguru import logger
 
-from notifications.services.crud import NotificationCRUDService
+from notifications.services.notification_crud_service import NotificationCRUDService
 
 
 class BidNotificationDispatcher:
@@ -57,5 +57,29 @@ class BidNotificationDispatcher:
             recipient=driver_user,
             message=message,
             actor=driver_user,  # Or client depending on who took the action
+            target=bid,
+        )
+
+    @staticmethod
+    def send_bid_amount_updated_notification(bid, old_amount, new_amount):
+        """Notifies the client when a driver updates their bid amount."""
+        if old_amount == new_amount or not bid.client or not bid.client.user:
+            return
+
+        client_user = bid.client.user
+        driver_user = (
+            bid.assigned_driver
+        )  # Or driver reference depending on your model setup
+
+        message = f"Driver has updated their bid amount for Booking #{bid.booking_id} from ${old_amount} to ${new_amount}."
+
+        logger.info(
+            f"Triggering bid amount update notification for client #{client_user.id}"
+        )
+
+        NotificationCRUDService.create_notification(
+            recipient=client_user,
+            message=message,
+            actor=driver_user,
             target=bid,
         )

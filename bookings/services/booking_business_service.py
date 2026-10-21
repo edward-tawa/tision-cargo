@@ -3,6 +3,9 @@ from loguru import logger
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from bookings.services.booking_crud_service import BookingCRUDService
+from notifications.services.dispatchers.bookings.booking_notification_dispatcher import (
+    BookingNotificationDispatcher,
+)
 from trips.services.trip_business_service import TripBusinessService
 
 
@@ -40,7 +43,6 @@ class BookingBusinessService:
         if not client.is_authenticated:
             raise PermissionDenied("Authentication is required to create a booking.")
 
-        # Create booking via CRUD service
         booking = BookingCRUDService.create_booking(
             client=client,
             pickup_address=pickup_address,
@@ -68,7 +70,7 @@ class BookingBusinessService:
     def accept_driver_bid(*, booking_id, bid_id, user):
         """
         Allows a client to accept a specific driver's bid for their booking.
-        Assigns the driver, updates statuses, and automatically spawns a Trip.
+        Assigns the driver, updates statuses, triggers notifications, and automatically spawns a Trip.
         """
         logger.info(
             f"User #{user.id} attempting to accept Bid #{bid_id} for Booking #{booking_id}"
@@ -76,7 +78,6 @@ class BookingBusinessService:
 
         booking = BookingCRUDService.get_booking(booking_id)
 
-        # 1. Permission guard: Only the booking owner can accept bids
         if booking.client != user:
             logger.warning(
                 f"Unauthorized bid acceptance attempt by User #{user.id} on Booking #{booking_id}"
@@ -85,7 +86,6 @@ class BookingBusinessService:
                 "Only the client who created this booking can accept bids."
             )
 
-        # 2. State validation: Booking must be open
         if booking.booking_status != booking.Status.OPEN:
             logger.error(
                 f"Cannot accept bid: Booking #{booking_id} is in status '{booking.booking_status}'"
@@ -96,7 +96,6 @@ class BookingBusinessService:
                 }
             )
 
-        # 3. Retrieve and validate the target bid
         from bids.services.bid_crud_service import BidCRUDService
 
         bid = BidCRUDService.get_bid(bid_id=bid_id)
@@ -106,12 +105,14 @@ class BookingBusinessService:
                 {"detail": "The specified bid does not belong to this booking."}
             )
 
-        # 4. Update Booking: Assign driver and mark as assigned
+        old_status = booking.booking_status
+
+        # Update Booking state
         booking.assigned_driver = bid.driver
         booking.booking_status = booking.Status.ASSIGNED
         booking.save(update_fields=["assigned_driver", "booking_status", "updated_at"])
 
-        # 5. Update Bid statuses: Accept winning bid, reject other competing bids for this booking
+        # Update Bid states
         bid.bid_status = bid.Status.ACCEPTED
         bid.save(update_fields=["bid_status", "updated_at"])
 
@@ -119,9 +120,15 @@ class BookingBusinessService:
             bid_status="rejected"
         )
 
-        # 6. Automatically generate the live tracking Trip
+        # Trigger notification to the assigned driver
+        if old_status != booking.booking_status:
+            BookingNotificationDispatcher.send_booking_status_change_notification(
+                booking, old_status=old_status, new_status=booking.booking_status
+            )
+
+        # Automatically generate the live tracking Trip
         trip = TripBusinessService.create_trip_from_accepted_bid(
-            booking=booking,
+            bid=bid,
             driver=bid.driver,
             client=booking.client,
         )
@@ -141,7 +148,6 @@ class BookingBusinessService:
 
         booking = BookingCRUDService.get_booking(booking_id)
 
-        # Permission guard
         if booking.client != user:
             logger.warning(
                 f"Unauthorized cancellation attempt by User #{user.id} on Booking #{booking_id}"
@@ -160,11 +166,17 @@ class BookingBusinessService:
                 }
             )
 
-        # Update status
+        old_status = booking.booking_status
+
         booking.booking_status = booking.Status.CANCELLED
         booking.save(update_fields=["booking_status", "updated_at"])
 
-        # Also cancel related active trips if they exist
+        # Trigger cancellation notification
+        if old_status != booking.booking_status:
+            BookingNotificationDispatcher.send_booking_status_change_notification(
+                booking, old_status=old_status, new_status=booking.booking_status
+            )
+
         if hasattr(booking, "trip") and booking.trip:
             if booking.trip.trip_status not in [
                 booking.trip.Status.COMPLETED,
